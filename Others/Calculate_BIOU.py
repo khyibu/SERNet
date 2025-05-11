@@ -8,6 +8,10 @@ from torch.nn import functional as F
 import torch
 
 def extract_boundary(mask):
+<<<<<<< HEAD
+=======
+    # 使用Canny边缘检测提取二值掩码的边界
+>>>>>>> c30a5c9d97d34b4910b640ff90b488e4676c6963
     edges = cv2.Canny((mask).astype(np.uint8), 100, 200)
     return edges
 
@@ -88,19 +92,43 @@ def save_result_single(dir, img_dir, dicts1, dicts2):
 
 
 def calculate_pixel(ori_dir, pre_dir, colors, mode_type, is_gray=False):
+<<<<<<< HEAD
     ori_imgs = sorted(os.listdir(ori_dir), key=lambda x: os.path.splitext(x)[0])
     pre_imgs = sorted(os.listdir(pre_dir), key=lambda x: os.path.splitext(x)[0])
 
     num_imgs = len(ori_imgs)
 
     checkPointName = pre_imgs[0][-7:-4]
+=======
+    ori_imgs = sorted(os.listdir(ori_dir), key=lambda x: os.path.splitext(x)[0])  # 标准数据
+    pre_imgs = sorted(os.listdir(pre_dir), key=lambda x: os.path.splitext(x)[0])  # 预测数据
+
+    num_imgs = len(ori_imgs)  # 总共有多少张图片
+    ori_width = 0  # 图片宽度
+    ori_height = 0  # 图片高度
+    pre_width = 0  # 图片宽度
+    pre_height = 0  # 图片高度
+
+    # if not num_imgs == len(pre_imgs):
+    #     print('影像与标签数量不一致，请检查后重试！')
+    #     return
+
+    checkPointName = pre_imgs[0][-7:-4]  # 获取这一组预测图明长城最后三位作为GUID
+>>>>>>> c30a5c9d97d34b4910b640ff90b488e4676c6963
 
     num_list = np.zeros((len(colors), len(colors), num_imgs), dtype=np.uint32)  # 计算所的结果保存在数组中
     BIOUlist = []
     for i in range(num_imgs):
+<<<<<<< HEAD
         ori_img_path = os.path.join(ori_dir, ori_imgs[i])
         pre_img_path = os.path.join(pre_dir, pre_imgs[i])
         ori_img = cv2.imdecode(np.fromfile(ori_img_path, dtype=np.uint8), mode_type)
+=======
+        ori_img_path = os.path.join(ori_dir, ori_imgs[i])  # 标准图像路径
+        pre_img_path = os.path.join(pre_dir, pre_imgs[i])  # 预测图像路径
+        ori_img = cv2.imdecode(np.fromfile(ori_img_path, dtype=np.uint8), mode_type)  # 读取图像
+        # pre_img = cv2.imread(pre_img_path, mode_type)
+>>>>>>> c30a5c9d97d34b4910b640ff90b488e4676c6963
         if is_gray:
             pre_img = cv2.imdecode(np.fromfile(pre_img_path, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
             pre_img = pre_img * 255
@@ -115,10 +143,17 @@ def calculate_pixel(ori_dir, pre_dir, colors, mode_type, is_gray=False):
             BIOU=compute_iou(pred_boundary, true_boundary)
             BIOUlist.append(BIOU)
 
+<<<<<<< HEAD
         ori_width = ori_img.shape[1]
         ori_height = ori_img.shape[0]
         pre_width = pre_img.shape[1]
         pre_height = pre_img.shape[0]
+=======
+        ori_width = ori_img.shape[1]  # 图片宽度
+        ori_height = ori_img.shape[0]  # 图片高度
+        pre_width = pre_img.shape[1]  # 图片宽度
+        pre_height = pre_img.shape[0]  # 图片高度
+>>>>>>> c30a5c9d97d34b4910b640ff90b488e4676c6963
         if not (ori_width, ori_height) == (pre_width, pre_height):
             print('影像与标签大小不一致，请检查后重试！')
             break
@@ -142,12 +177,23 @@ def calculate_pixel(ori_dir, pre_dir, colors, mode_type, is_gray=False):
                 num_list[j][l][i] = num_pixels  # 加入数组中，对应第J行，第L列，第I个图像（通道）
 
     num_matrix = num_list.sum(axis=2)  # 计算各个图像的总和
+<<<<<<< HEAD
 
+=======
+    # if num_matrix.sum() != (num_imgs * ori_width * ori_height):
+    #     print('存在像素不属于任何一种类别！')
+    #     return
+    # 返回所有图像的混淆矩阵和、单个图像组成的混淆矩阵、预测图像名称集合
+>>>>>>> c30a5c9d97d34b4910b640ff90b488e4676c6963
     return num_matrix, num_list, pre_imgs, checkPointName, BIOUlist
 
 
 def calculate_BIOU(ori_dir, pre_dir, txt_dir, note='', colors=None, is_gray=False):
+<<<<<<< HEAD
     if is_gray:
+=======
+    if is_gray:  # 判断是否为灰度图
+>>>>>>> c30a5c9d97d34b4910b640ff90b488e4676c6963
         mode_type = cv2.IMREAD_GRAYSCALE  #
         colors = [255, 0]
     else:
@@ -158,12 +204,24 @@ def calculate_BIOU(ori_dir, pre_dir, txt_dir, note='', colors=None, is_gray=Fals
 
     num = len(colors)  # 类别的个数
 
+<<<<<<< HEAD
     F1 = 0.0
+=======
+    OA = 0.0  # 整体精度
+    F1 = 0.0
+    Rec = 0.0  # 召回率 用于计算F1
+    Prc = 0.0  # 准确率 用于计算F1
+    TP_TN = 0
+>>>>>>> c30a5c9d97d34b4910b640ff90b488e4676c6963
     IoU = 0.0
     IoU1 = 0.0
     IoU2 = 0.0
     IoU3 = 0.0
+<<<<<<< HEAD
     TP_FP_TN_FN = np.sum(matrix_num)
+=======
+    TP_FP_TN_FN = np.sum(matrix_num)  # 所有参与计算元素的数量和
+>>>>>>> c30a5c9d97d34b4910b640ff90b488e4676c6963
     TP_list = np.zeros((num,), dtype=np.uint64)
     TN_list = np.zeros((num,), dtype=np.uint64)
     FN_list = np.zeros((num,), dtype=np.uint64)
@@ -212,16 +270,30 @@ def calculate_BIOU(ori_dir, pre_dir, txt_dir, note='', colors=None, is_gray=Fals
         IoU1 = IoU_list[0]
         IoU2 = IoU_list[1]
         IoU3 = IoU_list[2]
+<<<<<<< HEAD
         OA = np.sum(np.diagonal(matrix_num)) / TP_FP_TN_FN
+=======
+        OA = np.sum(np.diagonal(matrix_num)) / TP_FP_TN_FN  # 对角线上的元素/总元素
+>>>>>>> c30a5c9d97d34b4910b640ff90b488e4676c6963
 
     BIOU= np.average(BIOUlist)
     MIoU = np.average(IoU_list)
     Pe = np.dot(matrix_num.sum(axis=0), matrix_num.sum(axis=1) / 1e10)
+<<<<<<< HEAD
     Pe = Pe / TP_FP_TN_FN / TP_FP_TN_FN * 1e10
     Po = OA
     Kappa = (Po - Pe) / (1 - Pe)
 
     if is_gray:
+=======
+    Pe = Pe / TP_FP_TN_FN / TP_FP_TN_FN * 1e10  # 用于计算kappa
+    Po = OA  # 用于计算Kappa
+    Kappa = (Po - Pe) / (1 - Pe)
+
+    dicts = {}
+    if is_gray:
+        # print(matrix_num)
+>>>>>>> c30a5c9d97d34b4910b640ff90b488e4676c6963
         dicts = {
             '  OA   ': OA,
             '  MIoU ': MIoU,
@@ -252,6 +324,10 @@ def calculate_BIOU(ori_dir, pre_dir, txt_dir, note='', colors=None, is_gray=Fals
             ' BIou  ': BIOU,
         }
 
+<<<<<<< HEAD
+=======
+    # note = os.path.split(ori_dir)[1] + ' && ' + note + ' && ' + os.path.split(pre_dir)[1]
+>>>>>>> c30a5c9d97d34b4910b640ff90b488e4676c6963
     note = os.path.split(pre_dir)[1] + ' && ' + checkPointName
     txt_dir = txt_dir + '（' + checkPointName + '）' + '.txt'
     save_result(txt_dir, dicts, note)
@@ -273,6 +349,10 @@ def calculate_BIOU(ori_dir, pre_dir, txt_dir, note='', colors=None, is_gray=Fals
             IoU = IoU_list[0]
             OA = TP_TN / TP_FP_TN_FN
             F1 = 2 * Prc * Rec / (Prc + Rec)
+<<<<<<< HEAD
+=======
+            # print(list_num)
+>>>>>>> c30a5c9d97d34b4910b640ff90b488e4676c6963
 
         else:
             for j in range(num):
@@ -304,7 +384,12 @@ def calculate_BIOU(ori_dir, pre_dir, txt_dir, note='', colors=None, is_gray=Fals
         Po = OA  # 用于计算Kappa
         Kappa = (Po - Pe) / (1 - Pe)
         img_dir = list_img[i]
+<<<<<<< HEAD
 
+=======
+        lists1 = []
+        lists2 = []
+>>>>>>> c30a5c9d97d34b4910b640ff90b488e4676c6963
         if is_gray:
             lists1 = ['OA', 'IoU', 'MIoU', 'Kappa', 'F1', 'Prec', 'Reca', ' BIou']
             lists2 = [OA, IoU, MIoU, Kappa, F1, Prc, Rec, BIOU]
@@ -324,7 +409,11 @@ if __name__ == '__main__':
     pre_dir = r''
     now_time = time.strftime('%Y%m%d%H%M%S')
     txt_name = os.path.split(pre_dir)[1] + now_time
+<<<<<<< HEAD
     txt_dir = os.path.join(r'', txt_name)
+=======
+    txt_dir = os.path.join(r'result_path', txt_name)
+>>>>>>> c30a5c9d97d34b4910b640ff90b488e4676c6963
     calculate_BIOU(ori_dir, pre_dir, txt_dir, is_gray=True)
 
 
